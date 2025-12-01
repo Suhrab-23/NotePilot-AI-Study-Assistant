@@ -1,0 +1,662 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NotePilot - Study Session</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: #f5f5f5;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 25px 30px;
+            display: grid;
+            grid-template-columns: auto 1fr auto;
+            align-items: center;
+            gap: 20px;
+            .header-left {
+                display: flex;
+                align-items: center;
+                gap: 10px;
+            }
+
+            .header-center {
+                text-align: center;
+                font-size: 1.1em;
+                font-weight: 600;
+            }
+
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .header h1 {
+            font-size: 1.5em;
+        }
+
+        .filename {
+            font-size: 0.95em;
+        }
+
+        .main-content {
+            flex: 1;
+            display: grid;
+            grid-template-columns: 250px 1fr 1fr;
+            gap: 20px;
+            padding: 20px;
+            overflow: hidden;
+        }
+
+        .left-sidebar {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .new-doc-btn {
+            background: white;
+            border: 2px solid #667eea;
+            color: #667eea;
+            padding: 12px 20px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 1em;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .new-doc-btn:hover {
+            background: #667eea;
+            color: white;
+        }
+
+        .quiz-section {
+            background: white;
+            border-radius: 12px;
+            padding: 30px 20px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 20px;
+            flex: 1;
+        }
+
+        .quiz-section h2 {
+            color: #333;
+            font-size: 1.3em;
+            line-height: 1.4;
+        }
+
+        .summary-section {
+            background: white;
+            border-radius: 12px;
+            padding: 25px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            display: flex;
+            flex-direction: column;
+            /* Fix height so inner content can scroll */
+            overflow: hidden;
+        }
+
+        .summary-header h2 {
+                margin-bottom: 15px;
+            color: #333;
+            font-size: 1.3em;
+        }
+
+        .quiz-btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 18px 40px;
+            border-radius: 12px;
+            cursor: pointer;
+            font-size: 1.2em;
+            font-weight: 600;
+            transition: transform 0.2s;
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+        }
+
+        .quiz-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 16px rgba(102, 126, 234, 0.4);
+        }
+
+        .summary-text {
+            color: #555;
+            line-height: 1.8;
+            white-space: pre-wrap;
+            /* Make summary content scrollable */
+            overflow-y: auto;
+            overflow-x: hidden;
+            flex: 1 1 auto;
+        }
+
+        .chat-section {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .chat-section h2 {
+            color: #333;
+            font-size: 1.3em;
+            margin-bottom: 15px;
+        }
+
+        .chat-messages {
+            flex: 1;
+            overflow-y: auto;
+            margin-bottom: 20px;
+        }
+
+        .message {
+            margin-bottom: 15px;
+            padding: 12px 16px;
+            border-radius: 12px;
+            max-width: 60%;
+        }
+
+        .user-message {
+            background: #667eea;
+            color: white;
+            margin-left: auto;
+        }
+
+        .ai-message {
+            background: #f0f0f0;
+            color: #333;
+        }
+
+        .chat-input-area {
+            display: flex;
+            gap: 10px;
+        }
+
+        .chat-input {
+            flex: 1;
+            padding: 16px 16px;
+            border: 2px solid #ddd;
+            border-radius: 24px;
+            font-size: 1em;
+            outline: none;
+            transition: border-color 0.3s;
+        }
+
+        .chat-input:focus {
+            border-color: #667eea;
+        }
+
+        .send-btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 12px 28px;
+                font-weight: 600;
+            border-radius: 24px;
+            cursor: pointer;
+            font-size: 1em;
+            transition: transform 0.2s;
+        }
+
+        .send-btn:hover {
+            transform: scale(1.05);
+        }
+
+        .send-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .typing {
+            color: #999;
+            font-style: italic;
+            padding: 10px;
+        }
+
+        .quiz-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.7);
+            z-index: 1000;
+            overflow-y: auto;
+        }
+
+        .quiz-content {
+            background: white;
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 30px;
+            border-radius: 12px;
+        }
+
+        .quiz-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .close-btn {
+            font-size: 1.5em;
+            cursor: pointer;
+            color: #999;
+        }
+
+        .question-card {
+            background: #f9f9f9;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+
+        .question-text {
+            font-size: 1.1em;
+            font-weight: 600;
+            margin-bottom: 15px;
+            color: #333;
+        }
+
+        .option {
+            padding: 12px;
+            margin: 8px 0;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .option:hover {
+            border-color: #667eea;
+            background: #f0f2ff;
+        }
+
+        .option.selected {
+            border-color: #667eea;
+            background: #e8ebff;
+        }
+
+        .option.correct {
+            border-color: #4caf50;
+            background: #e8f5e9;
+        }
+
+        .option.incorrect {
+            border-color: #f44336;
+            background: #ffebee;
+        }
+
+        .explanation {
+            margin-top: 15px;
+            padding: 15px;
+            background: #e3f2fd;
+            border-left: 4px solid #2196f3;
+            border-radius: 4px;
+            display: none;
+        }
+
+        .quiz-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .submit-quiz-btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1em;
+        }
+
+        .next-quiz-btn {
+            background: #e0e0e0;
+            color: #555;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 8px;
+            cursor: not-allowed;
+            font-size: 1em;
+        }
+
+        .next-quiz-btn.enabled {
+            background: #ffffff;
+            border: 2px solid #667eea;
+            color: #667eea;
+            cursor: pointer;
+        }
+
+        .score-display {
+            text-align: center;
+            padding: 30px;
+            font-size: 2em;
+            color: #667eea;
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="header-left">
+            <h1>📚 NotePilot</h1>
+        </div>
+        <div class="header-center">
+            <div class="filename">📄 {{ filename }}</div>
+        </div>
+        <div></div>
+    </div>
+
+    <div class="main-content">
+        <div class="left-sidebar">
+            <button class="new-doc-btn" onclick="window.location.href='/'">📄 New Document</button>
+            <div class="quiz-section">
+                <h2>🎯 Ready to Test Your Knowledge?</h2>
+                <button class="quiz-btn" onclick="generateQuiz()">Generate Quiz</button>
+            </div>
+        </div>
+
+        <div class="summary-section">
+            <div class="summary-header">
+                <h2>📝 Summary</h2>
+            </div>
+            <div class="summary-text" id="summaryText">Loading summary...</div>
+        </div>
+
+        <div class="chat-section">
+            <h2>💬 Ask Questions</h2>
+            <div class="chat-messages" id="chatMessages">
+                <div class="message ai-message">
+                    Hi! I've analyzed your document. Feel free to ask me any questions about the material!
+                </div>
+            </div>
+
+            <div class="chat-input-area">
+                <input type="text" class="chat-input" id="chatInput" placeholder="Ask a question about your notes..." onkeypress="handleKeyPress(event)">
+                <button class="send-btn" id="sendBtn" onclick="sendMessage()">Send</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="quiz-modal" id="quizModal">
+        <div class="quiz-content">
+            <div class="quiz-header">
+                <h2>🎯 Practice Quiz</h2>
+                <span class="close-btn" onclick="closeQuiz()">&times;</span>
+            </div>
+            <div id="quizQuestions"></div>
+            <div class="score-display" id="scoreDisplay"></div>
+            <div class="quiz-actions" id="quizActions">
+                <button class="submit-quiz-btn" id="submitQuizBtn" onclick="submitCurrentQuestion()">Submit</button>
+                <button class="next-quiz-btn" id="nextQuizBtn" onclick="nextQuestion()">Next ▶</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Simple markdown-like formatting for summary
+        function formatSummary(text) {
+            return text
+                // Bold: **text** or *text* -> <strong>text</strong>
+                .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+                .replace(/\*(.+?)\*/g, '<strong>$1</strong>')
+                // Bullet points: lines starting with * or - become list items
+                .replace(/^[\*\-]\s+(.+)$/gm, '• $1')
+                // Preserve line breaks
+                .replace(/\n/g, '<br>');
+        }
+
+        // Load summary from session storage
+        const summary = sessionStorage.getItem('summary');
+        if (summary) {
+            document.getElementById('summaryText').innerHTML = formatSummary(summary);
+        }
+
+        let quizData = null;
+        let currentQuestionIndex = 0;
+        let answeredCurrent = false;
+        let correctCount = 0;
+
+        function handleKeyPress(event) {
+            if (event.key === 'Enter') {
+                sendMessage();
+            }
+        }
+
+        async function sendMessage() {
+            const input = document.getElementById('chatInput');
+            const message = input.value.trim();
+            
+            if (!message) return;
+
+            const messagesDiv = document.getElementById('chatMessages');
+            const sendBtn = document.getElementById('sendBtn');
+
+            // Add user message
+            const userMsg = document.createElement('div');
+            userMsg.className = 'message user-message';
+            userMsg.textContent = message;
+            messagesDiv.appendChild(userMsg);
+
+            input.value = '';
+            sendBtn.disabled = true;
+
+            // Show typing indicator
+            const typingDiv = document.createElement('div');
+            typingDiv.className = 'typing';
+            typingDiv.textContent = 'NotePilot is thinking...';
+            messagesDiv.appendChild(typingDiv);
+            messagesDiv.scrollTop = messagesDiv.scrollHeight;
+
+            try {
+                const response = await fetch('/chat', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ question: message })
+                });
+
+                const data = await response.json();
+                typingDiv.remove();
+
+                if (data.error) {
+                    const errorMsg = document.createElement('div');
+                    errorMsg.className = 'message ai-message';
+                    errorMsg.textContent = '⚠️ ' + data.error;
+                    errorMsg.style.color = '#d32f2f';
+                    messagesDiv.appendChild(errorMsg);
+                } else {
+                    const aiMsg = document.createElement('div');
+                    aiMsg.className = 'message ai-message';
+                    aiMsg.textContent = data.answer;
+                    messagesDiv.appendChild(aiMsg);
+                }
+            } catch (error) {
+                typingDiv.remove();
+                const errorMsg = document.createElement('div');
+                errorMsg.className = 'message ai-message';
+                errorMsg.textContent = '⚠️ Error: ' + error.message;
+                errorMsg.style.color = '#d32f2f';
+                messagesDiv.appendChild(errorMsg);
+            }
+
+            sendBtn.disabled = false;
+            messagesDiv.scrollTop = messagesDiv.scrollHeight;
+        }
+
+        let quizAbortController = null;
+
+        async function generateQuiz() {
+            const modal = document.getElementById('quizModal');
+            const questionsDiv = document.getElementById('quizQuestions');
+            
+            questionsDiv.innerHTML = '<p style="text-align: center; padding: 40px;">Generating quiz questions...</p>';
+            modal.style.display = 'block';
+
+            try {
+                // Setup cancellation
+                quizAbortController = new AbortController();
+                const { signal } = quizAbortController;
+                const response = await fetch('/generate-quiz', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ summary: summary || '' }),
+                    signal
+                });
+
+                const data = await response.json();
+
+                if (data.error) {
+                    questionsDiv.innerHTML = `<p style="color: #d32f2f; text-align: center;">${data.error}</p>`;
+                    return;
+                }
+
+                quizData = data.questions;
+                if (!quizData || quizData.length < 1) {
+                    questionsDiv.innerHTML = '<p style="text-align:center;color:#d32f2f;">No questions generated. Please try again.</p>';
+                    return;
+                }
+                currentQuestionIndex = 0;
+                correctCount = 0;
+                renderCurrentQuestion();
+            } catch (error) {
+                if (error.name === 'AbortError') {
+                    // silently ignore aborted fetch
+                    return;
+                }
+                questionsDiv.innerHTML = `<p style="color: #d32f2f; text-align: center;">Error: ${error.message}</p>`;
+            }
+        }
+
+        function renderCurrentQuestion() {
+            const questionsDiv = document.getElementById('quizQuestions');
+            const scoreDisplay = document.getElementById('scoreDisplay');
+            const actions = document.getElementById('quizActions');
+            
+            // Reset the quiz actions to the original buttons if they were replaced
+            actions.innerHTML = `
+                <button class="submit-quiz-btn" id="submitQuizBtn" onclick="submitCurrentQuestion()">Submit</button>
+                <button class="next-quiz-btn" id="nextQuizBtn" onclick="nextQuestion()">Next ▶</button>
+            `;
+            
+            // Hide score display
+            scoreDisplay.style.display = 'none';
+            
+            const submitBtn = document.getElementById('submitQuizBtn');
+            const nextBtn = document.getElementById('nextQuizBtn');
+            const q = quizData[currentQuestionIndex];
+
+            questionsDiv.innerHTML = '';
+            const card = document.createElement('div');
+            card.className = 'question-card';
+            card.innerHTML = `
+                <div class="question-text">Question ${currentQuestionIndex + 1} of ${quizData.length}: ${q.question}</div>
+                ${Object.entries(q.options).map(([key, value]) => `
+                    <div class="option" data-question="${q.id}" data-answer="${key}" onclick="selectOption(${q.id}, '${key}')">
+                        <strong>${key})</strong> ${value}
+                    </div>
+                `).join('')}
+                <div class="explanation" id="explanation-${q.id}">
+                    <strong>Correct Answer: ${q.correct})</strong><br>
+                    ${q.explanation}
+                </div>
+            `;
+            questionsDiv.appendChild(card);
+
+            // Reset state for this question
+            answeredCurrent = false;
+            submitBtn.disabled = false;
+            nextBtn.classList.remove('enabled');
+            nextBtn.disabled = true;
+        }
+
+        function selectOption(questionId, answer) {
+            const options = document.querySelectorAll(`[data-question="${questionId}"]`);
+            options.forEach(opt => opt.classList.remove('selected'));
+            event.target.closest('.option').classList.add('selected');
+        }
+
+        function submitCurrentQuestion() {
+            if (!quizData || answeredCurrent) return;
+            const q = quizData[currentQuestionIndex];
+            const selected = document.querySelector(`[data-question="${q.id}"].selected`);
+            const explanation = document.getElementById(`explanation-${q.id}`);
+            const submitBtn = document.getElementById('submitQuizBtn');
+            const nextBtn = document.getElementById('nextQuizBtn');
+
+            if (!selected) return; // require a selection
+            const answer = selected.getAttribute('data-answer');
+            const options = document.querySelectorAll(`[data-question="${q.id}"]`);
+
+            if (answer === q.correct) {
+                selected.classList.add('correct');
+                correctCount++;
+            } else {
+                selected.classList.add('incorrect');
+                options.forEach(opt => {
+                    if (opt.getAttribute('data-answer') === q.correct) {
+                        opt.classList.add('correct');
+                    }
+                });
+            }
+            explanation.style.display = 'block';
+            answeredCurrent = true;
+            submitBtn.disabled = true; // prevent resubmit
+            nextBtn.classList.add('enabled');
+            nextBtn.disabled = false;
+        }
+
+        function nextQuestion() {
+            const nextBtn = document.getElementById('nextQuizBtn');
+            if (!answeredCurrent || nextBtn.disabled) return;
+            if (currentQuestionIndex < quizData.length - 1) {
+                currentQuestionIndex++;
+                renderCurrentQuestion();
+            } else {
+                // Finished: show final score
+                const score = ((correctCount / quizData.length) * 100).toFixed(0);
+                const scoreDisplay = document.getElementById('scoreDisplay');
+                scoreDisplay.innerHTML = `Your Score: ${correctCount}/${quizData.length} (${score}%)`;
+                scoreDisplay.style.display = 'block';
+                document.getElementById('quizQuestions').innerHTML = '<p style="text-align:center;">Quiz complete! Review your score above.</p>';
+                // Replace actions with a single Exit button
+                const actions = document.getElementById('quizActions');
+                actions.innerHTML = '<button class="submit-quiz-btn" onclick="closeQuiz()">Exit</button>';
+            }
+        }
+
+        function closeQuiz() {
+            // Abort any in-flight quiz generation
+            if (quizAbortController) {
+                try { quizAbortController.abort(); } catch {}
+                quizAbortController = null;
+            }
+            document.getElementById('quizModal').style.display = 'none';
+        }
+    </script>
+</body>
+</html>
