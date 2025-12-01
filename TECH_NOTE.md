@@ -1,6 +1,6 @@
 # NotePilot - Technical Note
 
-Suhrab Roeen 100811513
+Suhrab Roeen
 
 ---
 
