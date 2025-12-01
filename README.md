@@ -1,6 +1,6 @@
 # 📚 NotePilot - AI Study Assistant
 
-Suhrab Roeen 100811513
+Suhrab Roeen
 
 NotePilot is an AI-powered study companion that helps students understand their course materials through intelligent summarization, interactive Q&A, and practice quizzes. Built with Flask, RAG (Retrieval-Augmented Generation), and local Ollama models for privacy and cost-free operation.
 
